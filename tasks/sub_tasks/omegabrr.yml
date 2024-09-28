@@ -1,0 +1,77 @@
+---
+
+################################
+# CLEAN UP
+################################
+
+- name: Register omegabrr container
+  community.docker.docker_container_info:
+    name: '{{ autobrr_omegabrr_basics_name }}'
+  register: autobrr_omegabrr_existing_container_result
+
+- name: Remove existing omegabrr container
+  when: autobrr_omegabrr_existing_container_result.exists
+  community.docker.docker_container:
+    container_default_behavior: compatibility
+    name: '{{ autobrr_omegabrr_basics_name }}'
+    state: absent
+    stop_timeout: 10
+  register: remove_autobrr_omegabrr_docker
+  retries: 5
+  delay: 10
+  until: remove_autobrr_omegabrr_docker is succeeded
+
+################################
+# APPDATA
+################################
+
+- name: Create omegabrr appdata directory
+  ansible.builtin.file:
+    path: '{{ autobrr_omegabrr_paths_location }}'
+    state: directory
+    owner: '{{ autobrr_omegabrr_env_puid }}'
+    group: '{{ autobrr_omegabrr_env_pgid }}'
+    mode: '0755'
+
+################################
+# CONFIG
+################################
+
+- name: Check if omegabrr config yaml exists
+  ansible.builtin.stat:
+    path: '{{ autobrr_paths_location }}/config.yaml'
+  register: autobrr_omegabrr_config_yaml
+
+- name: Import config file
+  when: not autobrr_omegabrr_config_yaml.stat.exists
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/omegabrr_config.yaml.j2'
+    dest: '{{ autobrr_omegabrr_paths_location }}/config.yaml'
+    force: true
+    owner: '{{ autobrr_omegabrr_env_puid }}'
+    group: '{{ autobrr_omegabrr_env_pgid }}'
+    mode: '0664'
+
+- name: Wait for 'config.yaml' to be created
+  ansible.builtin.wait_for:
+    path: '{{ autobrr_omegabrr_paths_location }}/config.yaml'
+    state: present
+
+################################
+# CONTAINER
+################################
+
+- name: Create omegabrr container
+  community.docker.docker_container:
+    name: '{{ autobrr_omegabrr_basics_name }}'
+    image: '{{ autobrr_omegabrr_basics_image_repo }}:{{ autobrr_omegabrr_basics_image_tag }}'
+    networks: 
+      - name: '{{ autobrr_network_backend }}'
+    env:
+      PUID: '{{ autobrr_omegabrr_env_puid }}'
+      PGID: '{{ autobrr_omegabrr_env_pgid }}'
+      TZ: '{{ autobrr_omegabrr_env_timezone }}'
+    ports:
+      - '{{ autobrr_omegabrr_ports_host }}:{{ autobrr_omegabrr_ports_cont }}'
+    volumes: '{{ autobrr_omegabrr_binds_config_mapping }}'
+    restart_policy: '{{ autobrr_omegabrr_basics_restart_policy }}'

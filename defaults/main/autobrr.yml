@@ -1,0 +1,87 @@
+---
+
+################################
+# BASICS
+################################
+
+autobrr_basics_name: 'autobrr'
+autobrr_basics_image_repo: 'ghcr.io/autobrr/autobrr'
+autobrr_basics_image_tag: 'latest'
+autobrr_basics_restart_policy: 'unless-stopped'
+
+################################
+# NETWORK
+################################
+
+autobrr_network_backend: 'proxy' ## allows backend docker communication between autobrr and companion apps, such as omegabrr
+autobrr_network_backend_driver: []  ## only required if network doesn't exist
+autobrr_network_backend_subnet: []  ## only required if network doesn't exist
+
+################################
+# ENV
+################################
+
+autobrr_env_timezone: []
+autobrr_env_puid: []
+autobrr_env_pgid: []
+
+################################
+# PORTS
+################################
+
+autobrr_ports_host: '7474'
+autobrr_ports_cont: '7474'
+
+################################
+# PATHS
+################################
+
+autobrr_paths_folder: '{{ autobrr_basics_name }}'
+autobrr_paths_location: '/opt/{{ autobrr_paths_folder }}'
+autobrr_paths_keys_folder: 'keys'
+autobrr_paths_keys_location: '{{ autobrr_paths_location }}/{{ autobrr_paths_keys_folder }}'
+autobrr_paths_logs_folder: '{{ autobrr_basics_name }}'
+autobrr_paths_logs_location: '/opt/logs/{{ autobrr_paths_logs_folder }}'
+
+################################
+# BINDS
+################################
+
+autobrr_binds_config_mapping:
+  - '{{ autobrr_paths_location }}:/config'
+
+autobrr_binds_keys_mapping:
+  - '{{ autobrr_paths_keys_location }}:/keys'
+
+autobrr_binds_logs_mapping:
+  - '{{ autobrr_paths_logs_location }}:/logs'
+
+################################
+# TRAEFIK
+################################
+
+autobrr_traefik_subdomain: '{{ autobrr_basics_name }}'
+autobrr_traefik_domain: []
+autobrr_traefik_port: '7474'
+
+  ## traefik docker network
+autobrr_traefik_network: 'traefik_proxy'
+autobrr_traefik_network_driver: []  ## only required if network doesn't exist
+autobrr_traefik_network_subnet: []  ## only required if network doesn't exist
+
+################################
+# CLOUDFLARE
+################################
+
+autobrr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
+autobrr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
+autobrr_cloudflare_api_token: []
+
+################################
+# LOGS
+################################
+
+autobrr_logs_autobrr_log_path: '/log/{{ autobrr_basics_name }}.log'  ## container log path
+autobrr_logs_autobrr_log_level: 'DEBUG'  ## Options: "ERROR", "DEBUG", "INFO", "WARN", "TRACE"
+autobrr_logs_autobrr_log_max_size: '50'  ## Max log size in megabytes
+autobrr_logs_autobrr_log_max_backups: '3'  ## Max amount of old log files

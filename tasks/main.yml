@@ -1,0 +1,235 @@
+---
+
+################################
+# CHECK
+################################
+
+- name: Autobrr builtin fail
+  when: not autobrr_is_enabled
+  ansible.builtin.fail:
+    msg: Autobrr role is being run but one or multiple variables are empty. Check the defaults/autobrr.yml file.
+
+################################
+# DEPENDENCIES
+################################
+
+- name: Install prerequisite apt packages
+  ansible.builtin.apt:
+    pkg:
+      - python3-requests
+      - python3-psycopg2
+      - python3-lxml
+    update_cache: true
+
+- name: Install collection requirements
+  community.general.ansible_galaxy_install:
+    type: collection
+    requirements_file: '{{ role_path }}/requirements.yml'
+
+################################
+# DOCKER
+################################
+
+- name: Apt install docker if required
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Gather apt facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Include docker install tasks
+      when: '"docker-ce" not in ansible_facts.packages'
+      ansible.builtin.include_tasks: 'sub_tasks/docker.yml'
+
+################################
+# CLEAN UP
+################################
+
+- name: Register autobrr container
+  community.docker.docker_container_info:
+    name: '{{ autobrr_basics_name }}'
+  register: autobrr_existing_container_result
+
+- name: Remove existing autobrr container
+  when: autobrr_existing_container_result.exists
+  community.docker.docker_container:
+    container_default_behavior: compatibility
+    name: '{{ autobrr_basics_name }}'
+    state: absent
+    stop_timeout: 10
+  register: remove_autobrr_docker
+  retries: 5
+  delay: 10
+  until: remove_autobrr_docker is succeeded
+
+################################
+# BACKEND NETWORK
+################################
+
+- name: Conduct backend network tasks
+  when: autobrr_network_backend_is_enabled
+  block:
+    - name: Register autobrr backend network
+      community.docker.docker_network_info:
+        name: '{{ autobrr_network_backend }}'
+      register: autobrr_net_backend_result
+
+    - name: Autobrr network backend builtin fail
+      ansible.builtin.fail:
+        msg: autobrr backend network does not exist nor is it enabled. Ensure the autobrr backend network variables contain valid entries.
+      when:
+        - not autobrr_net_backend_result.exists
+        - not autobrr_network_backend_is_enabled
+
+    - name: Create autobrr backend network
+      when:
+        - not autobrr_net_backend_result.exists
+        - autobrr_network_backend_is_enabled
+      community.docker.docker_network:
+        name: '{{ autobrr_network_backend }}'
+        driver: '{{ autobrr_network_backend_driver }}'
+        ipam_config:
+          - subnet: '{{ autobrr_network_backend_subnet }}'
+
+################################
+# APPDATA
+################################
+
+- name: Create autobrr directories
+  block:
+    - name: Create autobrr appdata directory
+      ansible.builtin.file:
+        path: '{{ autobrr_paths_location }}'
+        state: directory
+        owner: '{{ autobrr_env_puid }}'
+        group: '{{ autobrr_env_pgid }}'
+        mode: '0755'
+
+    - name: Create autobrr keys directory
+      ansible.builtin.file:
+        path: '{{ autobrr_paths_keys_location }}'
+        state: directory
+        owner: '{{ autobrr_env_puid }}'
+        group: '{{ autobrr_env_pgid }}'
+        mode: '0755'
+
+    - name: Create autobrr log directory
+      ansible.builtin.file:
+        path: '{{ autobrr_paths_logs_location }}'
+        state: directory
+        owner: '{{ autobrr_env_puid }}'
+        group: '{{ autobrr_env_pgid }}'
+        mode: '0755'
+
+################################
+# CONFIG
+################################
+
+- name: Check if autobrr config toml exists
+  ansible.builtin.stat:
+    path: '{{ autobrr_paths_location }}/config.toml'
+  register: autobrr_config_toml
+
+- name: Generate sessionSecret
+  when: not autobrr_config_toml.stat.exists
+  ansible.builtin.shell: 'head /dev/urandom | tr -dc A-Za-z0-9 | head -c16'
+  register: autobrr_session_secret
+
+- name: Import autobrr config file
+  when: not autobrr_config_toml.stat.exists
+  ansible.builtin.template:
+    src: '{{ role_path }}/templates/autobrr_config.toml.j2'
+    dest: '{{ autobrr_paths_location }}/config.toml'
+    force: true
+    owner: '{{ autobrr_env_puid }}'
+    group: '{{ autobrr_env_pgid }}'
+    mode: '0664'
+
+- name: Wait for 'config.toml' to be created
+  ansible.builtin.wait_for:
+    path: '{{ autobrr_paths_location }}/config.toml'
+    state: present
+
+################################
+# POSTGRES
+################################
+
+- name: Include postgres container tasks
+  when: autobrr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_container.yml'
+
+- name: Include postgres database tasks
+  when: autobrr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_database.yml'
+
+################################
+# TRAEFIK
+################################
+
+- name: Conduct traefik tasks
+  when: autobrr_traefik_is_enabled
+  block:
+    - name: Register traefik network
+      community.docker.docker_network_info:
+        name: '{{ autobrr_traefik_network }}'
+      register: autobrr_traefik_network_result
+
+    - name: Traefik builtin fail
+      when:
+        - not autobrr_traefik_network_is_enabled
+        - not autobrr_traefik_network_result.exists
+      ansible.builtin.fail:
+        msg: Traefik network does not exist nor is it enabled. Ensure the Traefik network variables contain valid entries.
+
+    - name: Create traefik network
+      when: not autobrr_traefik_network_result.exists
+      community.docker.docker_network:
+        name: '{{ autobrr_traefik_network }}'
+        driver: '{{ autobrr_traefik_network_driver }}'
+        ipam_config:
+          - subnet: '{{ autobrr_traefik_network_subnet }}'
+
+################################
+# CLOUDFLARE
+################################
+
+- name: Include cloudflare tasks
+  when: autobrr_cloudflare_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/cloudflare.yml'
+
+################################
+# CONTAINER
+################################
+
+- name: Create autobrr container
+  when: not autobrr_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ autobrr_basics_name }}'
+    image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
+    networks: '{{ autobrr_docker_networks }}'
+    env: '{{ autobrr_docker_envs }}'
+    ports:
+      - '{{ autobrr_ports_host }}:{{ autobrr_ports_cont }}'
+    volumes: '{{ autobrr_binds }}'
+    restart_policy: '{{ autobrr_basics_restart_policy }}'
+
+- name: Create autobrr traefik container
+  when: autobrr_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ autobrr_basics_name }}'
+    image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
+    networks: '{{ autobrr_docker_networks }}'
+    env: '{{ autobrr_docker_envs }}'
+    labels: '{{ autobrr_traefik_labels }}'
+    ports:
+      - '{{ autobrr_ports_host }}:{{ autobrr_ports_cont }}'
+    volumes: '{{ autobrr_binds }}'
+    restart_policy: '{{ autobrr_basics_restart_policy }}'
+
+################################
+# OMEGABRR
+################################
+
+- name: Include omegabrr tasks
+  when: autobrr_omegabrr_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/omegabrr.yml'

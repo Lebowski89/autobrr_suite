@@ -1,0 +1,20 @@
+---
+
+- name: Ping for existing database
+  community.postgresql.postgresql_ping:
+    login_host: '{{ autobrr_postgres_basics_host }}'
+    login_user: '{{ autobrr_postgres_auth_user }}'
+    login_password: '{{ autobrr_postgres_auth_password }}'
+    port: '{{ autobrr_postgres_ports_host }}'
+    db: '{{ autobrr_postgres_database }}'
+  register: autobrr_postgres_db
+
+- name: Create postgres database
+  when: not autobrr_postgres_db == true
+  community.postgresql.postgresql_db:
+    login_host: '{{ autobrr_postgres_basics_host }}'
+    login_user: '{{ autobrr_postgres_auth_user }}'
+    login_password: '{{ autobrr_postgres_auth_password }}'
+    port: '{{ autobrr_postgres_ports_host }}'
+    name: '{{ autobrr_postgres_database }}'
+    state: 'present'

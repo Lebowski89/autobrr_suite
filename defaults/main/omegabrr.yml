@@ -1,0 +1,39 @@
+---
+
+################################
+# BASICS
+################################
+
+autobrr_omegabrr_basics_name: 'omegabrr'
+autobrr_omegabrr_basics_image_repo: 'ghcr.io/autobrr/omegabrr'
+autobrr_omegabrr_basics_image_tag: 'latest'
+autobrr_omegabrr_basics_restart_policy: 'unless-stopped'
+
+################################
+# ENV
+################################
+
+autobrr_omegabrr_env_timezone: []
+autobrr_omegabrr_env_puid: []
+autobrr_omegabrr_env_pgid: []
+
+################################
+# PORTS
+################################
+
+autobrr_omegabrr_ports_host: '7441'
+autobrr_omegabrr_ports_cont: '7441'
+
+################################
+# PATHS
+################################
+
+autobrr_omegabrr_paths_folder: '{{ autobrr_omegabrr_basics_name }}'
+autobrr_omegabrr_paths_location: '/opt/{{ autobrr_omegabrr_paths_folder }}'
+
+################################
+# BINDS
+################################
+
+autobrr_omegabrr_binds_config_mapping:
+  - '{{ autobrr_omegabrr_paths_location }}:/config'
