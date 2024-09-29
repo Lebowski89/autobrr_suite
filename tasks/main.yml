@@ -105,14 +105,6 @@
         group: '{{ autobrr_env_pgid }}'
         mode: '0755'
 
-    - name: Create autobrr keys directory
-      ansible.builtin.file:
-        path: '{{ autobrr_paths_keys_location }}'
-        state: directory
-        owner: '{{ autobrr_env_puid }}'
-        group: '{{ autobrr_env_pgid }}'
-        mode: '0755'
-
     - name: Create autobrr log directory
       ansible.builtin.file:
         path: '{{ autobrr_paths_logs_location }}'
@@ -162,6 +154,10 @@
   when: autobrr_postgres_is_enabled
   ansible.builtin.include_tasks: 'postgres/postgres_database.yml'
 
+- name: Include postgres autobrr config tasks
+  when: autobrr_postgres_is_enabled
+  ansible.builtin.include_tasks: 'postgres/postgres_config_toml.yml'
+
 ################################
 # TRAEFIK
 ################################
@@ -207,7 +203,10 @@
     name: '{{ autobrr_basics_name }}'
     image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
     networks: '{{ autobrr_docker_networks }}'
-    env: '{{ autobrr_docker_envs }}'
+    env:
+      PUID: '{{ autobrr_env_puid }}'
+      PGID: '{{ autobrr_env_pgid }}'
+      TZ: '{{ autobrr_env_timezone }}'
     ports:
       - '{{ autobrr_ports_host }}:{{ autobrr_ports_cont }}'
     volumes: '{{ autobrr_binds }}'
@@ -219,7 +218,10 @@
     name: '{{ autobrr_basics_name }}'
     image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
     networks: '{{ autobrr_docker_networks }}'
-    env: '{{ autobrr_docker_envs }}'
+    env:
+      PUID: '{{ autobrr_env_puid }}'
+      PGID: '{{ autobrr_env_pgid }}'
+      TZ: '{{ autobrr_env_timezone }}'
     labels: '{{ autobrr_traefik_labels }}'
     ports:
       - '{{ autobrr_ports_host }}:{{ autobrr_ports_cont }}'

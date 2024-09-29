@@ -14,16 +14,16 @@ autobrr_basics_restart_policy: 'unless-stopped'
 ################################
 
 autobrr_network_backend: 'proxy' ## allows backend docker communication between autobrr and companion apps, such as omegabrr
-autobrr_network_backend_driver: []  ## only required if network doesn't exist
-autobrr_network_backend_subnet: []  ## only required if network doesn't exist
+autobrr_network_backend_driver: 'bridge'  ## only required if network doesn't exist
+autobrr_network_backend_subnet: '172.62.0.0/24'  ## only required if network doesn't exist
 
 ################################
 # ENV
 ################################
 
-autobrr_env_timezone: []
-autobrr_env_puid: []
-autobrr_env_pgid: []
+autobrr_env_timezone: 'Australia/Melbourne'
+autobrr_env_puid: 'ansible'
+autobrr_env_pgid: 'ansible'
 
 ################################
 # PORTS
@@ -38,8 +38,6 @@ autobrr_ports_cont: '7474'
 
 autobrr_paths_folder: '{{ autobrr_basics_name }}'
 autobrr_paths_location: '/opt/{{ autobrr_paths_folder }}'
-autobrr_paths_keys_folder: 'keys'
-autobrr_paths_keys_location: '{{ autobrr_paths_location }}/{{ autobrr_paths_keys_folder }}'
 autobrr_paths_logs_folder: '{{ autobrr_basics_name }}'
 autobrr_paths_logs_location: '/opt/logs/{{ autobrr_paths_logs_folder }}'
 
@@ -50,9 +48,6 @@ autobrr_paths_logs_location: '/opt/logs/{{ autobrr_paths_logs_folder }}'
 autobrr_binds_config_mapping:
   - '{{ autobrr_paths_location }}:/config'
 
-autobrr_binds_keys_mapping:
-  - '{{ autobrr_paths_keys_location }}:/keys'
-
 autobrr_binds_logs_mapping:
   - '{{ autobrr_paths_logs_location }}:/logs'
 
@@ -61,13 +56,19 @@ autobrr_binds_logs_mapping:
 ################################
 
 autobrr_traefik_subdomain: '{{ autobrr_basics_name }}'
-autobrr_traefik_domain: []
+autobrr_traefik_domain: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33373464666566633733626236323931376164303065373538386462653261393636613634353064
+          6665303139653037343130353132656534353764643537610a313339346138383130313139326439
+          32636631376539386237333033646638396331333337313863643662313639356263633162636265
+          6239356136326335630a333937653166356134353361343930343136346562323761613433646133
+          34666466343163316664613963316462316365653332383137323633326461346137
 autobrr_traefik_port: '7474'
 
   ## traefik docker network
 autobrr_traefik_network: 'traefik_proxy'
-autobrr_traefik_network_driver: []  ## only required if network doesn't exist
-autobrr_traefik_network_subnet: []  ## only required if network doesn't exist
+autobrr_traefik_network_driver: 'bridge'  ## only required if network doesn't exist
+autobrr_traefik_network_subnet: '172.21.0.0/24'  ## only required if network doesn't exist
 
 ################################
 # CLOUDFLARE
@@ -75,7 +76,14 @@ autobrr_traefik_network_subnet: []  ## only required if network doesn't exist
 
 autobrr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
 autobrr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
-autobrr_cloudflare_api_token: []
+autobrr_cloudflare_api_token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          63363139383634373339643637346230343037656336333733656536613536306666623033626662
+          6364313065383038323062663866623363383863373134360a386162393363666435643434656439
+          31393331343762326435633639333739663530383534383364373138306661643539306633303763
+          6262323863336538650a373238306134363633303966323531663363386536313432393631653934
+          35306632303436636465646262616463636566306338323537353535306362616436323338313936
+          6634343538346335303335333863353261626339633032646439
 
 ################################
 # LOGS

@@ -19,10 +19,10 @@
 - name: Check if postgres_key.txt exists
   ansible.builtin.stat:
     path: '{{ autobrr_postgres_paths_keys_location }}/{{ autobrr_postgres_auth_password_file }}'
-  register: autobrr_postgres_key_txt
+  register: autobrr_postgres_db_key_txt
 
 - name: Insert postgres password into password file
-  when: not autobrr_postgres_key_txt.stat.exists
+  when: not autobrr_postgres_db_key_txt.stat.exists
   ansible.builtin.lineinfile:
     path: '{{ autobrr_postgres_paths_keys_location }}/{{ autobrr_postgres_auth_password_file }}'
     line: '{{ autobrr_postgres_auth_password }}'
