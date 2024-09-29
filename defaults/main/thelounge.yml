@@ -1,0 +1,73 @@
+---
+
+################################
+# BASICS
+################################
+
+autobrr_thelounge_basics_name: 'thelounge'
+autobrr_thelounge_basics_image_repo: 'lscr.io/linuxserver/thelounge'
+autobrr_thelounge_basics_image_tag: 'latest'
+autobrr_thelounge_basics_restart_policy: 'unless-stopped'
+
+################################
+# ENV
+################################
+
+autobrr_thelounge_env_timezone: 'Australia/Melbourne'
+autobrr_thelounge_env_puid: 'ansible'
+autobrr_thelounge_env_pgid: 'ansible'
+
+################################
+# PORTS
+################################
+
+autobrr_thelounge_ports_host: '9001'
+autobrr_thelounge_ports_cont: '9000'
+
+################################
+# PATHS
+################################
+
+autobrr_thelounge_paths_folder: '{{ autobrr_thelounge_basics_name }}'
+autobrr_thelounge_paths_location: '/opt/{{ autobrr_thelounge_paths_folder }}'
+
+################################
+# BINDS
+################################
+
+autobrr_thelounge_binds_config_mapping:
+  - '{{ autobrr_thelounge_paths_location }}/config:/config'
+
+################################
+# TRAEFIK
+################################
+
+autobrr_thelounge_traefik_subdomain: '{{ autobrr_thelounge_basics_name }}'
+autobrr_thelounge_traefik_domain: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36653266326465353232396464363162303534333137373163366433353666346163643630653664
+          3036343162376663653634636366346134356261616237640a626530383839376463663463366337
+          37306336383561383336643463623266313539623936646330343035313665656130653634346466
+          3531373964323237300a653530343130383864633563303034343463306532316134633039643263
+          65346532326334366236343631353463646362643638303866333235396564376463
+autobrr_thelounge_traefik_port: '9000'
+
+  ## traefik docker network
+autobrr_thelounge_traefik_network: 'traefik_proxy'
+autobrr_thelounge_traefik_network_driver: 'bridge'  ## only required if network doesn't exist
+autobrr_thelounge_traefik_network_subnet: '172.21.0.0/24'  ## only required if network doesn't exist
+
+################################
+# CLOUDFLARE
+################################
+
+autobrr_thelounge_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
+autobrr_thelounge_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
+autobrr_thelounge_cloudflare_api_token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37333362666332306334663161666665373363396333306566643038626565336435326636336131
+          3866656435643232353138373461326335373637393830660a386238356239333239376531313732
+          35336439343564623965323536313739343165666562626537666533633562386665643837333764
+          3762353366343230660a613962613036386166393739656235323232326235623361366165373132
+          31353439656237346136633265643438313534376230363565393232643432323966663536376134
+          6134356163623163343162663666393132653232653961323934

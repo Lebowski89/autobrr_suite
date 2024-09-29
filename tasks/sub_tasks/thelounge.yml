@@ -1,0 +1,104 @@
+---
+
+################################
+# CLEAN UP
+################################
+
+- name: Register thelounge container
+  community.docker.docker_container_info:
+    name: '{{ autobrr_thelounge_basics_name }}'
+  register: autobrr_thelounge_existing_container_result
+
+- name: Remove existing thelounge container
+  when: autobrr_thelounge_existing_container_result.exists
+  community.docker.docker_container:
+    container_default_behavior: compatibility
+    name: '{{ autobrr_thelounge_basics_name }}'
+    state: absent
+    stop_timeout: 10
+  register: remove_autobrr_thelounge_docker
+  retries: 5
+  delay: 10
+  until: remove_autobrr_thelounge_docker is succeeded
+
+################################
+# APPDATA
+################################
+
+- name: Create thelounge appdata directory
+  ansible.builtin.file:
+    path: '{{ autobrr_thelounge_paths_location }}'
+    state: directory
+    owner: '{{ autobrr_thelounge_env_puid }}'
+    group: '{{ autobrr_thelounge_env_pgid }}'
+    mode: '0755'
+
+- name: Create thelounge config directory
+  ansible.builtin.file:
+    path: '{{ autobrr_thelounge_paths_location }}/config'
+    state: directory
+    owner: '{{ autobrr_thelounge_env_puid }}'
+    group: '{{ autobrr_thelounge_env_pgid }}'
+    mode: '0755'
+
+################################
+# TRAEFIK
+################################
+
+- name: Conduct traefik tasks
+  when: autobrr_thelounge_traefik_is_enabled
+  block:
+    - name: Register traefik network
+      community.docker.docker_network_info:
+        name: '{{ autobrr_thelounge_traefik_network }}'
+      register: autobrr_thelounge_traefik_network_result
+
+    - name: Traefik builtin fail
+      when:
+        - not autobrr_thelounge_traefik_network_is_enabled
+        - not autobrr_thelounge_traefik_network_result.exists
+      ansible.builtin.fail:
+        msg: Traefik network does not exist nor is it enabled. Ensure the Traefik network variables contain valid entries.
+
+    - name: Create traefik network
+      when: not autobrr_thelounge_traefik_network_result.exists
+      community.docker.docker_network:
+        name: '{{ autobrr_thelounge_traefik_network }}'
+        driver: '{{ autobrr_thelounge_traefik_network_driver }}'
+        ipam_config:
+          - subnet: '{{ autobrr_thelounge_traefik_network_subnet }}'
+
+################################
+# CONTAINER
+################################
+
+- name: Create thelounge container
+  when: not autobrr_thelounge_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ autobrr_thelounge_basics_name }}'
+    image: '{{ autobrr_thelounge_basics_image_repo }}:{{ autobrr_thelounge_basics_image_tag }}'
+    networks: '{{ autobrr_thelounge_docker_networks }}'
+    env:
+      PUID: '{{ autobrr_thelounge_env_puid }}'
+      PGID: '{{ autobrr_thelounge_env_pgid }}'
+      TZ: '{{ autobrr_thelounge_env_timezone }}'
+    ports:
+      - '{{ autobrr_thelounge_ports_host }}:{{ autobrr_thelounge_ports_cont }}'
+    volumes: '{{ autobrr_thelounge_binds_config_mapping }}'
+    restart_policy: '{{ autobrr_thelounge_basics_restart_policy }}'
+
+- name: Create thelounge traefik container
+  when: autobrr_thelounge_traefik_is_enabled
+  community.docker.docker_container:
+    name: '{{ autobrr_thelounge_basics_name }}'
+    image: '{{ autobrr_thelounge_basics_image_repo }}:{{ autobrr_thelounge_basics_image_tag }}'
+    networks: '{{ autobrr_thelounge_docker_networks }}'
+    env:
+      PUID: '{{ autobrr_thelounge_env_puid }}'
+      PGID: '{{ autobrr_thelounge_env_pgid }}'
+      TZ: '{{ autobrr_thelounge_env_timezone }}'
+    labels: '{{ autobrr_thelounge_traefik_labels }}'
+    ports:
+      - '{{ autobrr_thelounge_ports_host }}:{{ autobrr_thelounge_ports_cont }}'
+    volumes: '{{ autobrr_thelounge_binds_config_mapping }}'
+    restart_policy: '{{ autobrr_thelounge_basics_restart_policy }}'

@@ -42,6 +42,11 @@
     path: '{{ autobrr_paths_location }}/config.yaml'
   register: autobrr_omegabrr_config_yaml
 
+- name: Generate API token
+  when: not autobrr_omegabrr_config_yaml.stat.exists
+  ansible.builtin.set_fact:
+    omegabrr_api: '{{ lookup("community.general.random_string", override_all="0123456789abcdef", length=32) }}'
+
 - name: Import config file
   when: not autobrr_omegabrr_config_yaml.stat.exists
   ansible.builtin.template:

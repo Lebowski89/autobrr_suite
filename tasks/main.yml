@@ -235,3 +235,11 @@
 - name: Include omegabrr tasks
   when: autobrr_omegabrr_is_enabled
   ansible.builtin.include_tasks: 'sub_tasks/omegabrr.yml'
+
+################################
+# IRC (TheLounge)
+################################
+
+- name: Include thelounge tasks
+  when: autobrr_thelounge_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/thelounge.yml'
