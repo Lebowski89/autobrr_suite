@@ -4,7 +4,7 @@
 # BASICS
 ################################
 
-autobrr_postgres_basics_host: '192.168.80.68'  # machine address for ansible postgres module to ping database
+autobrr_postgres_basics_host: []  # machine address for ansible postgres module to ping database
 autobrr_postgres_basics_name: 'postgres'
 autobrr_postgres_basics_image_repo: 'postgres'
 autobrr_postgres_basics_image_tag: '14'
@@ -15,16 +15,16 @@ autobrr_postgres_basics_restart_policy: 'unless-stopped'
 ################################
 
 autobrr_postgres_network: 'postgres'
-autobrr_postgres_network_driver: 'bridge'  ## only required if network doesn't exist
-autobrr_postgres_network_subnet: '172.69.0.0/24'  ## only required if network doesn't exist
+autobrr_postgres_network_driver: []  ## only required if network doesn't exist
+autobrr_postgres_network_subnet: []  ## only required if network doesn't exist
 
 ################################
 # ENV
 ################################
 
-autobrr_postgres_env_timezone: 'Australia/Melbourne'
-autobrr_postgres_env_puid: 'ansible'
-autobrr_postgres_env_pgid: 'ansible'
+autobrr_postgres_env_timezone: []
+autobrr_postgres_env_puid: []
+autobrr_postgres_env_pgid: []
 
 ################################
 # PORTS
@@ -56,14 +56,8 @@ autobrr_postgres_binds_keys_mapping:
 # AUTH
 ################################
 
-autobrr_postgres_auth_user: 'lebowski89'
-autobrr_postgres_auth_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          33613763313161393939366133303764386566636531353262346466666537336630343834653163
-          6438303531343233636463343033636134353663303938650a306663316538356238616461366338
-          65343264653763636265353831393935346538323865616533386532356139666265376263636464
-          3535356436633839620a376364353634396466663239363235373064323235306239653961613339
-          6532
+autobrr_postgres_auth_user: []
+autobrr_postgres_auth_password: []
 autobrr_postgres_auth_password_file: 'postgres_key.txt'
 
 ################################
@@ -79,4 +73,4 @@ autobrr_postgres_database: 'autobrr'
   ## warning: the below toggles will delete any existing sqlite database files in the autobrr appdir.
   ## toggle false if you're planning to migrate db data. See: https://autobrr.com/installation/supplementary/postgresql
 
-autobrr_postgres_clean_files: true  # true will delete any existing sqlite database files in the autobrr appdir.
+autobrr_postgres_clean_files: false  # true will delete any existing sqlite database files in the autobrr appdir.

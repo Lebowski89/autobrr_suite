@@ -85,4 +85,3 @@ autobrr_postgres_network_is_enabled: '{{ (autobrr_postgres_network is defined) a
 
 autobrr_postgres_binds: '{{ autobrr_postgres_binds_config_mapping
                             + autobrr_postgres_binds_keys_mapping }}'
-
