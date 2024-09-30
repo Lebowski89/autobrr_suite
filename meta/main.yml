@@ -12,8 +12,15 @@ galaxy_info:
   galaxy_tags:
     - autobrr
     - omegabrr
+    - docker
+    - postgres
+    - thelounge
+    - cloudflare
+    - traefik
     - pvr
     - autodl-irssi
+    - indexers
+    - irc
     - usenet
     - torrent
     - bittorrent
