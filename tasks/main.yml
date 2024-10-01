@@ -7,7 +7,7 @@
 - name: Autobrr builtin fail
   when: not autobrr_is_enabled
   ansible.builtin.fail:
-    msg: Autobrr role is being run but one or multiple variables are empty. Check the defaults/autobrr.yml file.
+    msg: 'Autobrr role is being run but one or multiple variables are empty. Check the defaults/autobrr.yml file.'
 
 ################################
 # DEPENDENCIES

@@ -13,9 +13,9 @@ autobrr_thelounge_basics_restart_policy: 'unless-stopped'
 # ENV
 ################################
 
-autobrr_thelounge_env_timezone: []
-autobrr_thelounge_env_puid: []
-autobrr_thelounge_env_pgid: []
+autobrr_thelounge_env_timezone: ''
+autobrr_thelounge_env_puid: ''
+autobrr_thelounge_env_pgid: ''
 
 ################################
 # PORTS
@@ -43,13 +43,13 @@ autobrr_thelounge_binds_config_mapping:
 ################################
 
 autobrr_thelounge_traefik_subdomain: '{{ autobrr_thelounge_basics_name }}'
-autobrr_thelounge_traefik_domain: []
+autobrr_thelounge_traefik_domain: ''
 autobrr_thelounge_traefik_port: '9000'
 
   ## traefik docker network
 autobrr_thelounge_traefik_network: 'traefik_proxy'
-autobrr_thelounge_traefik_network_driver: []  ## only required if network doesn't exist
-autobrr_thelounge_traefik_network_subnet: []  ## only required if network doesn't exist
+autobrr_thelounge_traefik_network_driver: ''  ## only required if network doesn't exist
+autobrr_thelounge_traefik_network_subnet: ''  ## only required if network doesn't exist
 
 ################################
 # CLOUDFLARE
@@ -57,4 +57,4 @@ autobrr_thelounge_traefik_network_subnet: []  ## only required if network doesn'
 
 autobrr_thelounge_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
 autobrr_thelounge_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
-autobrr_thelounge_cloudflare_api_token: []
+autobrr_thelounge_cloudflare_api_token: ''
