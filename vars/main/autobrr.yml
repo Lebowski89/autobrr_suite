@@ -4,22 +4,7 @@
 # BASICS
 ################################
 
-autobrr_is_enabled: '{{ (autobrr_basics_name is defined) and
-                        (autobrr_basics_name is not none) and
-                        (autobrr_basics_name | trim | length > 0) and
-                        (autobrr_basics_image_repo is defined) and
-                        (autobrr_basics_image_repo is not none) and
-                        (autobrr_basics_image_repo | trim | length > 0) and
-                        (autobrr_basics_image_tag is defined) and
-                        (autobrr_basics_image_tag is not none) and
-                        (autobrr_basics_image_tag | trim | length > 0) and
-                        (autobrr_basics_restart_policy is defined) and
-                        (autobrr_basics_restart_policy is not none) and
-                        (autobrr_basics_restart_policy | trim | length > 0) and
-                        (autobrr_network_backend is defined) and
-                        (autobrr_network_backend is not none) and
-                        (autobrr_network_backend | trim | length > 0) and
-                        (autobrr_env_timezone is defined) and
+autobrr_is_enabled: '{{ (autobrr_env_timezone is defined) and
                         (autobrr_env_timezone is not none) and
                         (autobrr_env_timezone | trim | length > 0) and
                         (autobrr_env_puid is defined) and
@@ -27,57 +12,11 @@ autobrr_is_enabled: '{{ (autobrr_basics_name is defined) and
                         (autobrr_env_puid | trim | length > 0) and
                         (autobrr_env_pgid is defined) and
                         (autobrr_env_pgid is not none) and
-                        (autobrr_env_pgid | trim | length > 0) and
-                        (autobrr_ports_host is defined) and
-                        (autobrr_ports_host is not none) and
-                        (autobrr_ports_host | trim | length > 0) and
-                        (autobrr_ports_cont is defined) and
-                        (autobrr_ports_cont is not none) and
-                        (autobrr_ports_cont | trim | length > 0) and
-                        (autobrr_paths_folder is defined) and
-                        (autobrr_paths_folder is not none) and
-                        (autobrr_paths_folder | trim | length > 0) and
-                        (autobrr_paths_location is defined) and
-                        (autobrr_paths_location is not none) and
-                        (autobrr_paths_location | trim | length > 0) and
-                        (autobrr_paths_logs_folder is defined) and
-                        (autobrr_paths_logs_folder is not none) and
-                        (autobrr_paths_logs_folder | trim | length > 0) and
-                        (autobrr_paths_logs_location is defined) and
-                        (autobrr_paths_logs_location is not none) and
-                        (autobrr_paths_logs_location | trim | length > 0) and
-                        (autobrr_binds_config_mapping is defined) and
-                        (autobrr_binds_config_mapping is not none) and
-                        (autobrr_binds_config_mapping | trim | length > 0) and
-                        (autobrr_binds_logs_mapping is defined) and
-                        (autobrr_binds_logs_mapping is not none) and
-                        (autobrr_binds_logs_mapping | trim | length > 0) and
-                        (autobrr_logs_autobrr_log_path is defined) and
-                        (autobrr_logs_autobrr_log_path is not none) and
-                        (autobrr_logs_autobrr_log_path | trim | length > 0) and
-                        (autobrr_logs_autobrr_log_level is defined) and
-                        (autobrr_logs_autobrr_log_level is not none) and
-                        (autobrr_logs_autobrr_log_level | trim | length > 0) and
-                        (autobrr_logs_autobrr_log_max_size is defined) and
-                        (autobrr_logs_autobrr_log_max_size is not none) and
-                        (autobrr_logs_autobrr_log_max_size | trim | length > 0) and
-                        (autobrr_logs_autobrr_log_max_backups is defined) and
-                        (autobrr_logs_autobrr_log_max_backups is not none) and
-                        (autobrr_logs_autobrr_log_max_backups | trim | length > 0) }}'
+                        (autobrr_env_pgid | trim | length > 0) }}'
 
 ################################
 # NETWORK
 ################################
-
-autobrr_network_backend_is_enabled: '{{ (autobrr_network_backend is defined) and
-                                        (autobrr_network_backend is not none) and
-                                        (autobrr_network_backend | trim | length > 0) and
-                                        (autobrr_network_backend_driver is defined) and
-                                        (autobrr_network_backend_driver is not none) and
-                                        (autobrr_network_backend_driver | trim | length > 0) and
-                                        (autobrr_network_backend_subnet is defined) and
-                                        (autobrr_network_backend_subnet is not none) and
-                                        (autobrr_network_backend_subnet | trim | length > 0) }}'
 
 autobrr_network_default_bind:
   - name: '{{ autobrr_network_backend }}'
@@ -94,6 +33,13 @@ autobrr_docker_networks: '{{ autobrr_network_default_bind
                                 if autobrr_traefik_is_enabled
                                 else []) }}'
 
+autobrr_network_backend_is_enabled: '{{ (autobrr_network_backend_driver is defined) and
+                                        (autobrr_network_backend_driver is not none) and
+                                        (autobrr_network_backend_driver | trim | length > 0) and
+                                        (autobrr_network_backend_subnet is defined) and
+                                        (autobrr_network_backend_subnet is not none) and
+                                        (autobrr_network_backend_subnet | trim | length > 0) }}'
+
 ################################
 # BINDS
 ################################
@@ -104,29 +50,6 @@ autobrr_binds: '{{ autobrr_binds_config_mapping
 ################################
 # TRAEFIK
 ################################
-
-autobrr_traefik_is_enabled: '{{ (autobrr_traefik_network is defined) and
-                                (autobrr_traefik_network is not none) and
-                                (autobrr_traefik_network | trim | length > 0) and
-                                (autobrr_traefik_subdomain is defined) and
-                                (autobrr_traefik_subdomain is not none) and
-                                (autobrr_traefik_subdomain | trim | length > 0) and
-                                (autobrr_traefik_domain is defined) and
-                                (autobrr_traefik_domain is not none) and
-                                (autobrr_traefik_domain | trim | length > 0) and
-                                (autobrr_traefik_port is defined) and
-                                (autobrr_traefik_port is not none) and
-                                (autobrr_traefik_port | trim | length > 0) }}'
-
-autobrr_traefik_network_is_enabled: '{{ (autobrr_traefik_network is defined) and
-                                        (autobrr_traefik_network is not none) and
-                                        (autobrr_traefik_network | trim | length > 0) and
-                                        (autobrr_traefik_network_driver is defined) and
-                                        (autobrr_traefik_network_driver is not none) and
-                                        (autobrr_traefik_network_driver | trim | length > 0) and
-                                        (autobrr_traefik_network_subnet is defined) and
-                                        (autobrr_traefik_network_subnet is not none) and
-                                        (autobrr_traefik_network_subnet | trim | length > 0) }}'
 
 autobrr_traefik_labels_default:
   traefik.enable: 'true'
@@ -154,6 +77,17 @@ autobrr_traefik_labels: '{{ autobrr_traefik_labels_default
                             | combine(autobrr_traefik_labels_router)
                             | combine(autobrr_traefik_labels_router_secure) }}'
 
+autobrr_traefik_is_enabled: '{{ (autobrr_traefik_domain is defined) and
+                                (autobrr_traefik_domain is not none) and
+                                (autobrr_traefik_domain | trim | length > 0) }}'
+
+autobrr_traefik_network_is_enabled: '{{ (autobrr_traefik_network_driver is defined) and
+                                        (autobrr_traefik_network_driver is not none) and
+                                        (autobrr_traefik_network_driver | trim | length > 0) and
+                                        (autobrr_traefik_network_subnet is defined) and
+                                        (autobrr_traefik_network_subnet is not none) and
+                                        (autobrr_traefik_network_subnet | trim | length > 0) }}'
+
 ################################
 # CLOUDFLARE
 ################################
@@ -161,12 +95,6 @@ autobrr_traefik_labels: '{{ autobrr_traefik_labels_default
 autobrr_cloudflare_record: '{{ autobrr_traefik_subdomain }}'
 autobrr_cloudflare_zone: '{{ autobrr_traefik_domain }}'
 
-autobrr_cloudflare_is_enabled: '{{ (autobrr_cloudflare_record_type is defined) and
-                                   (autobrr_cloudflare_record_type is not none) and
-                                   (autobrr_cloudflare_record_type | trim | length > 0) and
-                                   (autobrr_cloudflare_proxy is defined) and
-                                   (autobrr_cloudflare_proxy is not none) and
-                                   (autobrr_cloudflare_proxy | trim | length > 0) and
-                                   (autobrr_cloudflare_api_token is defined) and
+autobrr_cloudflare_is_enabled: '{{ (autobrr_cloudflare_api_token is defined) and
                                    (autobrr_cloudflare_api_token is not none) and
                                    (autobrr_cloudflare_api_token | trim | length > 0) }}'

@@ -1,66 +1,21 @@
 ---
 
-autobrr_omegabrr_clients_lidarr_is_enabled: '{{ (autobrr_omegabrr_lidarr_name is defined) and
-                                                (autobrr_omegabrr_lidarr_name is not none) and
-                                                (autobrr_omegabrr_lidarr_name | trim | length > 0) and
-                                                (autobrr_omegabrr_lidarr_type is defined) and
-                                                (autobrr_omegabrr_lidarr_type is not none) and
-                                                (autobrr_omegabrr_lidarr_type | trim | length > 0) and
-                                                (autobrr_omegabrr_lidarr_host is defined) and
-                                                (autobrr_omegabrr_lidarr_host is not none) and
-                                                (autobrr_omegabrr_lidarr_host | trim | length > 0) and
-                                                (autobrr_omegabrr_lidarr_api is defined) and
+autobrr_omegabrr_clients_lidarr_is_enabled: '{{ (autobrr_omegabrr_lidarr_api is defined) and
                                                 (autobrr_omegabrr_lidarr_api is not none) and
                                                 (autobrr_omegabrr_lidarr_api | trim | length > 0) }}'
 
-autobrr_omegabrr_clients_radarr_is_enabled: '{{ (autobrr_omegabrr_radarr_name is defined) and
-                                                (autobrr_omegabrr_radarr_name is not none) and
-                                                (autobrr_omegabrr_radarr_name | trim | length > 0) and
-                                                (autobrr_omegabrr_radarr_type is defined) and
-                                                (autobrr_omegabrr_radarr_type is not none) and
-                                                (autobrr_omegabrr_radarr_type | trim | length > 0) and
-                                                (autobrr_omegabrr_radarr_host is defined) and
-                                                (autobrr_omegabrr_radarr_host is not none) and
-                                                (autobrr_omegabrr_radarr_host | trim | length > 0) and
-                                                (autobrr_omegabrr_radarr_api is defined) and
+autobrr_omegabrr_clients_radarr_is_enabled: '{{ (autobrr_omegabrr_radarr_api is defined) and
                                                 (autobrr_omegabrr_radarr_api is not none) and
                                                 (autobrr_omegabrr_radarr_api | trim | length > 0) }}'
 
-autobrr_omegabrr_clients_radarr4k_is_enabled: '{{ (autobrr_omegabrr_radarr4k_name is defined) and
-                                                  (autobrr_omegabrr_radarr4k_name is not none) and
-                                                  (autobrr_omegabrr_radarr4k_name | trim | length > 0) and
-                                                  (autobrr_omegabrr_radarr4k_type is defined) and
-                                                  (autobrr_omegabrr_radarr4k_type is not none) and
-                                                  (autobrr_omegabrr_radarr4k_type | trim | length > 0) and
-                                                  (autobrr_omegabrr_radarr4k_host is defined) and
-                                                  (autobrr_omegabrr_radarr4k_host is not none) and
-                                                  (autobrr_omegabrr_radarr4k_host | trim | length > 0) and
-                                                  (autobrr_omegabrr_radarr4k_api is defined) and
+autobrr_omegabrr_clients_radarr4k_is_enabled: '{{ (autobrr_omegabrr_radarr4k_api is defined) and
                                                   (autobrr_omegabrr_radarr4k_api is not none) and
                                                   (autobrr_omegabrr_radarr4k_api | trim | length > 0) }}'
 
-autobrr_omegabrr_clients_sonarr_is_enabled: '{{ (autobrr_omegabrr_sonarr_name is defined) and
-                                                (autobrr_omegabrr_sonarr_name is not none) and
-                                                (autobrr_omegabrr_sonarr_name | trim | length > 0) and
-                                                (autobrr_omegabrr_sonarr_type is defined) and
-                                                (autobrr_omegabrr_sonarr_type is not none) and
-                                                (autobrr_omegabrr_sonarr_type | trim | length > 0) and
-                                                (autobrr_omegabrr_sonarr_host is defined) and
-                                                (autobrr_omegabrr_sonarr_host is not none) and
-                                                (autobrr_omegabrr_sonarr_host | trim | length > 0) and
-                                                (autobrr_omegabrr_sonarr_api is defined) and
+autobrr_omegabrr_clients_sonarr_is_enabled: '{{ (autobrr_omegabrr_sonarr_api is defined) and
                                                 (autobrr_omegabrr_sonarr_api is not none) and
                                                 (autobrr_omegabrr_sonarr_api | trim | length > 0) }}'
 
-autobrr_omegabrr_clients_whisparr_is_enabled: '{{ (autobrr_omegabrr_whisparr_name is defined) and
-                                                  (autobrr_omegabrr_whisparr_name is not none) and
-                                                  (autobrr_omegabrr_whisparr_name | trim | length > 0) and
-                                                  (autobrr_omegabrr_whisparr_type is defined) and
-                                                  (autobrr_omegabrr_whisparr_type is not none) and
-                                                  (autobrr_omegabrr_whisparr_type | trim | length > 0) and
-                                                  (autobrr_omegabrr_whisparr_host is defined) and
-                                                  (autobrr_omegabrr_whisparr_host is not none) and
-                                                  (autobrr_omegabrr_whisparr_host | trim | length > 0) and
-                                                  (autobrr_omegabrr_whisparr_api is defined) and
+autobrr_omegabrr_clients_whisparr_is_enabled: '{{ (autobrr_omegabrr_whisparr_api is defined) and
                                                   (autobrr_omegabrr_whisparr_api is not none) and
                                                   (autobrr_omegabrr_whisparr_api | trim | length > 0) }}'
