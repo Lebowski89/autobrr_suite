@@ -237,8 +237,12 @@
   ansible.builtin.include_tasks: 'sub_tasks/omegabrr.yml'
 
 ################################
-# IRC (TheLounge)
+# IRC
 ################################
+
+- name: Include znc tasks
+  when: autobrr_znc_is_enabled
+  ansible.builtin.include_tasks: 'sub_tasks/znc.yml'
 
 - name: Include thelounge tasks
   when: autobrr_thelounge_is_enabled

@@ -1,0 +1,93 @@
+---
+
+################################
+# BASICS
+################################
+
+autobrr_znc_is_enabled: '{{ (autobrr_znc_env_timezone is defined) and
+                            (autobrr_znc_env_timezone is not none) and
+                            (autobrr_znc_env_timezone | trim | length > 0) and
+                            (autobrr_znc_env_puid is defined) and
+                            (autobrr_znc_env_puid is not none) and
+                            (autobrr_znc_env_puid | trim | length > 0) and
+                            (autobrr_znc_env_pgid is defined) and
+                            (autobrr_znc_env_pgid is not none) and
+                            (autobrr_znc_env_pgid | trim | length > 0) }}'
+
+################################
+# NETWORK
+################################
+
+autobrr_znc_network_default_bind:
+  - name: '{{ autobrr_network_backend }}'
+autobrr_znc_network_traefik_bind:
+  - name: '{{ autobrr_traefik_network }}'
+
+autobrr_znc_docker_networks: '{{ autobrr_znc_network_default_bind
+                                 + (autobrr_znc_network_traefik_bind
+                                    if autobrr_znc_traefik_is_enabled
+                                    else []) }}'
+
+################################
+# TRAEFIK
+################################
+
+autobrr_znc_traefik_labels_default:
+  traefik.enable: 'true'
+  traefik.docker.network: '{{ autobrr_znc_traefik_network }}'
+
+autobrr_znc_traefik_labels_router:
+  traefik.http.routers.znc-rtr.entrypoints: 'http'
+  traefik.http.routers.znc-rtr.rule: 'Host(`{{ autobrr_znc_traefik_subdomain }}.{{ autobrr_znc_traefik_domain }}`)'
+  traefik.http.routers.znc-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.znc-rtr.priority: '20'
+  traefik.http.routers.znc-rtr.service: 'znc-rtr-svc'
+  traefik.http.services.znc-rtr-svc.loadbalancer.server.port: '{{ autobrr_znc_traefik_port }}'
+  traefik.http.routers.znc-api-rtr.entrypoints: 'http'
+  traefik.http.routers.znc-api-rtr.middlewares: 'globalHeaders@file,robotHeaders@file'
+  traefik.http.routers.znc-api-rtr.priority: '30'
+  traefik.http.routers.znc-api-rtr.rule: 'Host(`{{ autobrr_znc_traefik_subdomain }}.{{ autobrr_znc_traefik_domain }}`) && (PathPrefix(`/uploads`))'
+  traefik.http.routers.znc-api-rtr.service: 'znc-rtr-svc'
+
+autobrr_znc_traefik_labels_router_secure:
+  traefik.http.routers.znc-rtr-secure.entrypoints: 'https'
+  traefik.http.routers.znc-rtr-secure.rule: 'Host(`{{ autobrr_znc_traefik_subdomain }}.{{ autobrr_znc_traefik_domain }}`)'
+  traefik.http.routers.znc-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker'
+  traefik.http.routers.znc-rtr-secure.priority: '20'
+  traefik.http.routers.znc-rtr-secure.service: 'znc-rtr-secure-svc'
+  traefik.http.routers.znc-rtr-secure.tls.certresolver: 'dns-cloudflare'
+  traefik.http.routers.znc-rtr-secure.tls.options: 'tls-opts@file'
+  traefik.http.services.znc-rtr-secure-svc.loadbalancer.server.port: '{{ autobrr_znc_traefik_port }}'
+  traefik.http.routers.znc-api-rtr-secure.entrypoints: 'https'
+  traefik.http.routers.znc-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+  traefik.http.routers.znc-api-rtr-secure.priority: '30'
+  traefik.http.routers.znc-api-rtr-secure.rule: 'Host(`{{ autobrr_znc_traefik_subdomain }}.{{ autobrr_znc_traefik_domain }}`) && (PathPrefix(`/uploads`))'
+  traefik.http.routers.znc-api-rtr-secure.service: 'znc-rtr-secure-svc'
+  traefik.http.routers.znc-api-rtr-secure.tls.certresolver: 'dns-cloudflare'
+  traefik.http.routers.znc-api-rtr-secure.tls.options: 'tls-opts@file'
+
+autobrr_znc_traefik_labels: '{{ autobrr_znc_traefik_labels_default
+                                | combine(autobrr_znc_traefik_labels_router)
+                                | combine(autobrr_znc_traefik_labels_router_secure) }}'
+
+autobrr_znc_traefik_is_enabled: '{{ (autobrr_znc_traefik_domain is defined) and
+                                    (autobrr_znc_traefik_domain is not none) and
+                                    (autobrr_znc_traefik_domain | trim | length > 0) }}'
+
+autobrr_znc_traefik_network_is_enabled: '{{ (autobrr_znc_traefik_network_driver is defined) and
+                                            (autobrr_znc_traefik_network_driver is not none) and
+                                            (autobrr_znc_traefik_network_driver | trim | length > 0) and
+                                            (autobrr_znc_traefik_network_subnet is defined) and
+                                            (autobrr_znc_traefik_network_subnet is not none) and
+                                            (autobrr_znc_traefik_network_subnet | trim | length > 0) }}'
+
+################################
+# CLOUDFLARE
+################################
+
+autobrr_znc_cloudflare_record: '{{ autobrr_znc_traefik_subdomain }}'
+autobrr_znc_cloudflare_zone: '{{ autobrr_znc_traefik_domain }}'
+
+autobrr_znc_cloudflare_is_enabled: '{{ (autobrr_znc_cloudflare_api_token is defined) and
+                                       (autobrr_znc_cloudflare_api_token is not none) and
+                                       (autobrr_znc_cloudflare_api_token | trim | length > 0) }}'
