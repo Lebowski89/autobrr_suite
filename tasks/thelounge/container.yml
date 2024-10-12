@@ -42,38 +42,11 @@
     mode: '0755'
 
 ################################
-# TRAEFIK
-################################
-
-- name: Conduct traefik tasks
-  when: autobrr_thelounge_traefik_is_enabled
-  block:
-    - name: Register traefik network
-      community.docker.docker_network_info:
-        name: '{{ autobrr_thelounge_traefik_network }}'
-      register: autobrr_thelounge_traefik_network_result
-
-    - name: Traefik builtin fail
-      when:
-        - not autobrr_thelounge_traefik_network_is_enabled
-        - not autobrr_thelounge_traefik_network_result.exists
-      ansible.builtin.fail:
-        msg: Traefik network does not exist nor is it enabled. Ensure the Traefik network variables contain valid entries.
-
-    - name: Create traefik network
-      when: not autobrr_thelounge_traefik_network_result.exists
-      community.docker.docker_network:
-        name: '{{ autobrr_thelounge_traefik_network }}'
-        driver: '{{ autobrr_thelounge_traefik_network_driver }}'
-        ipam_config:
-          - subnet: '{{ autobrr_thelounge_traefik_network_subnet }}'
-
-################################
 # CONTAINER
 ################################
 
 - name: Create thelounge container
-  when: not autobrr_thelounge_traefik_is_enabled
+  when: (not autobrr_toggles_enable_traefik) or (not autobrr_thelounge_traefik_is_enabled)
   community.docker.docker_container:
     name: '{{ autobrr_thelounge_basics_name }}'
     image: '{{ autobrr_thelounge_basics_image_repo }}:{{ autobrr_thelounge_basics_image_tag }}'
@@ -88,7 +61,9 @@
     restart_policy: '{{ autobrr_thelounge_basics_restart_policy }}'
 
 - name: Create thelounge traefik container
-  when: autobrr_thelounge_traefik_is_enabled
+  when:
+    - autobrr_toggles_enable_traefik
+    - autobrr_thelounge_traefik_is_enabled
   community.docker.docker_container:
     name: '{{ autobrr_thelounge_basics_name }}'
     image: '{{ autobrr_thelounge_basics_image_repo }}:{{ autobrr_thelounge_basics_image_tag }}'

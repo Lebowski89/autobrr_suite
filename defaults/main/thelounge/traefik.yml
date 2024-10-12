@@ -1,0 +1,65 @@
+---
+
+################################
+# DOMAIN
+################################
+
+autobrr_thelounge_traefik_subdomain:
+autobrr_thelounge_traefik_domain:
+autobrr_thelounge_traefik_port: '9000'
+
+################################
+# NETWORK
+################################
+
+autobrr_thelounge_traefik_network: 'traefik_proxy'
+autobrr_thelounge_traefik_network_driver: 'bridge'  ## only required if network doesn't exist
+autobrr_thelounge_traefik_network_subnet: ''  ## only required if network doesn't exist
+
+################################
+# TLS
+################################
+
+autobrr_thelounge_traefik_tls_certresolver: 'dns-cloudflare'
+autobrr_thelounge_traefik_tls_options: 'tls-opts@file'
+
+################################
+# ROUTER (HTTP)
+################################
+
+  ## http
+autobrr_thelounge_traefik_http_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+autobrr_thelounge_traefik_http_rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`)'
+autobrr_thelounge_traefik_http_priority: '20'
+
+  ## http-api
+autobrr_thelounge_traefik_http_api_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+autobrr_thelounge_traefik_http_api_rule: '{{ autobrr_thelounge_traefik_http_rule }} && (PathPrefix(`/uploads`)'
+autobrr_thelounge_traefik_http_api_priority: '30'
+
+################################
+# ROUTER (HTTPS)
+################################
+
+  ## https
+autobrr_thelounge_traefik_https_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+autobrr_thelounge_traefik_https_rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`)'
+autobrr_thelounge_traefik_https_priority: '20'
+
+  ## https-api
+autobrr_thelounge_traefik_https_api_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+autobrr_thelounge_traefik_https_api_rule: '{{ autobrr_thelounge_traefik_https_rule }} && (PathPrefix(`/uploads`)'
+autobrr_thelounge_traefik_https_api_priority: '30'
+
+################################
+# AUTHELIA
+################################
+
+autobrr_thelounge_traefik_authelia_middleware: 'authelia@docker'
+
+################################
+# CLOUDFLARE
+################################
+
+autobrr_thelounge_traefik_cloudflare_middleware: 'cloudflarewarp@docker'
+

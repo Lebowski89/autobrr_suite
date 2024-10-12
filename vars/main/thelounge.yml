@@ -1,20 +1,6 @@
 ---
 
 ################################
-# BASICS
-################################
-
-autobrr_thelounge_is_enabled: '{{ (autobrr_thelounge_env_timezone is defined) and
-                                  (autobrr_thelounge_env_timezone is not none) and
-                                  (autobrr_thelounge_env_timezone | trim | length > 0) and
-                                  (autobrr_thelounge_env_puid is defined) and
-                                  (autobrr_thelounge_env_puid is not none) and
-                                  (autobrr_thelounge_env_puid | trim | length > 0) and
-                                  (autobrr_thelounge_env_pgid is defined) and
-                                  (autobrr_thelounge_env_pgid is not none) and
-                                  (autobrr_thelounge_env_pgid | trim | length > 0) }}'
-
-################################
 # NETWORK
 ################################
 
@@ -37,34 +23,38 @@ autobrr_thelounge_traefik_labels_default:
   traefik.docker.network: '{{ autobrr_thelounge_traefik_network }}'
 
 autobrr_thelounge_traefik_labels_router:
+  ## http
   traefik.http.routers.thelounge-rtr.entrypoints: 'http'
-  traefik.http.routers.thelounge-rtr.rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`)'
-  traefik.http.routers.thelounge-rtr.middlewares: 'globalHeaders@file,robotHeaders@file,authelia@docker'
-  traefik.http.routers.thelounge-rtr.priority: '20'
+  traefik.http.routers.thelounge-rtr.rule: '{{ autobrr_thelounge_traefik_http_rule }}'
+  traefik.http.routers.thelounge-rtr.middlewares: '{{ autobrr_thelounge_traefik_http_middlewares_bind }}'
+  traefik.http.routers.thelounge-rtr.priority: '{{ autobrr_thelounge_traefik_http_priority }}'
   traefik.http.routers.thelounge-rtr.service: 'thelounge-rtr-svc'
   traefik.http.services.thelounge-rtr-svc.loadbalancer.server.port: '{{ autobrr_thelounge_traefik_port }}'
+  ## http-api
   traefik.http.routers.thelounge-api-rtr.entrypoints: 'http'
-  traefik.http.routers.thelounge-api-rtr.middlewares: 'globalHeaders@file,robotHeaders@file'
-  traefik.http.routers.thelounge-api-rtr.priority: '30'
-  traefik.http.routers.thelounge-api-rtr.rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`) && (PathPrefix(`/uploads`))'
+  traefik.http.routers.thelounge-api-rtr.rule: '{{ autobrr_thelounge_traefik_http_api_rule }}'
+  traefik.http.routers.thelounge-api-rtr.middlewares: '{{ autobrr_thelounge_traefik_http_api_middlewares_bind }}'
+  traefik.http.routers.thelounge-api-rtr.priority: '{{ autobrr_thelounge_traefik_http_api_priority }}'
   traefik.http.routers.thelounge-api-rtr.service: 'thelounge-rtr-svc'
 
 autobrr_thelounge_traefik_labels_router_secure:
+  ## https
   traefik.http.routers.thelounge-rtr-secure.entrypoints: 'https'
-  traefik.http.routers.thelounge-rtr-secure.rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`)'
-  traefik.http.routers.thelounge-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file,authelia@docker'
-  traefik.http.routers.thelounge-rtr-secure.priority: '20'
+  traefik.http.routers.thelounge-rtr-secure.rule: '{{ autobrr_thelounge_traefik_https_rule }}'
+  traefik.http.routers.thelounge-rtr-secure.middlewares: '{{ autobrr_thelounge_traefik_https_middlewares_bind }}'
+  traefik.http.routers.thelounge-rtr-secure.priority: '{{ autobrr_thelounge_traefik_https_priority }}'
   traefik.http.routers.thelounge-rtr-secure.service: 'thelounge-rtr-secure-svc'
-  traefik.http.routers.thelounge-rtr-secure.tls.certresolver: 'dns-cloudflare'
-  traefik.http.routers.thelounge-rtr-secure.tls.options: 'tls-opts@file'
+  traefik.http.routers.thelounge-rtr-secure.tls.certresolver: '{{ autobrr_thelounge_traefik_tls_certresolver }}'
+  traefik.http.routers.thelounge-rtr-secure.tls.options: '{{ autobrr_thelounge_traefik_tls_options }}'
   traefik.http.services.thelounge-rtr-secure-svc.loadbalancer.server.port: '{{ autobrr_thelounge_traefik_port }}'
+  ## https-api
   traefik.http.routers.thelounge-api-rtr-secure.entrypoints: 'https'
-  traefik.http.routers.thelounge-api-rtr-secure.middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
-  traefik.http.routers.thelounge-api-rtr-secure.priority: '30'
-  traefik.http.routers.thelounge-api-rtr-secure.rule: 'Host(`{{ autobrr_thelounge_traefik_subdomain }}.{{ autobrr_thelounge_traefik_domain }}`) && (PathPrefix(`/uploads`))'
+  traefik.http.routers.thelounge-api-rtr-secure.rule: '{{ autobrr_thelounge_traefik_https_api_rule }}'
+  traefik.http.routers.thelounge-api-rtr-secure.middlewares: '{{ autobrr_thelounge_traefik_https_api_middlewares_bind }}'
+  traefik.http.routers.thelounge-api-rtr-secure.priority: '{{ autobrr_thelounge_traefik_https_api_priority }}'
   traefik.http.routers.thelounge-api-rtr-secure.service: 'thelounge-rtr-secure-svc'
-  traefik.http.routers.thelounge-api-rtr-secure.tls.certresolver: 'dns-cloudflare'
-  traefik.http.routers.thelounge-api-rtr-secure.tls.options: 'tls-opts@file'
+  traefik.http.routers.thelounge-api-rtr-secure.tls.certresolver: '{{ autobrr_thelounge_traefik_tls_certresolver }}'
+  traefik.http.routers.thelounge-api-rtr-secure.tls.options: '{{ autobrr_thelounge_traefik_tls_options }}'
 
 autobrr_thelounge_traefik_labels: '{{ autobrr_thelounge_traefik_labels_default
                                       | combine(autobrr_thelounge_traefik_labels_router)
@@ -80,6 +70,32 @@ autobrr_thelounge_traefik_network_is_enabled: '{{ (autobrr_thelounge_traefik_net
                                                   (autobrr_thelounge_traefik_network_subnet is defined) and
                                                   (autobrr_thelounge_traefik_network_subnet is not none) and
                                                   (autobrr_thelounge_traefik_network_subnet | trim | length > 0) }}'
+
+autobrr_thelounge_traefik_http_middlewares_bind: '{{ autobrr_thelounge_traefik_http_middlewares
+                                                     + (",cloudflarewarp@docker"
+                                                        if (autobrr_toggles_enable_cloudflarewarp)
+                                                        else "")
+                                                     + (",authelia@docker"
+                                                        if (autobrr_toggles_enable_authelia_middleware)
+                                                        else "") }}'
+
+autobrr_thelounge_traefik_http_api_middlewares_bind: '{{ autobrr_thelounge_traefik_http_api_middlewares
+                                                         + (",cloudflarewarp@docker"
+                                                            if (autobrr_toggles_enable_cloudflarewarp)
+                                                            else "") }}'
+
+autobrr_thelounge_traefik_https_middlewares_bind: '{{ autobrr_thelounge_traefik_https_middlewares
+                                                      + (",cloudflarewarp@docker"
+                                                         if (autobrr_toggles_enable_cloudflarewarp)
+                                                         else "")
+                                                      + (",authelia@docker"
+                                                         if (autobrr_toggles_enable_authelia_middleware)
+                                                         else "") }}'
+
+autobrr_thelounge_traefik_https_api_middlewares_bind: '{{ autobrr_thelounge_traefik_https_api_middlewares
+                                                          + (",cloudflarewarp@docker"
+                                                             if (autobrr_toggles_enable_cloudflarewarp)
+                                                             else "") }}'
 
 ################################
 # CLOUDFLARE

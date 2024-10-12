@@ -21,38 +21,11 @@
     mode: '0755'
 
 ################################
-# TRAEFIK
-################################
-
-- name: Conduct traefik tasks
-  when: autobrr_znc_traefik_is_enabled
-  block:
-    - name: Register traefik network
-      community.docker.docker_network_info:
-        name: '{{ autobrr_znc_traefik_network }}'
-      register: autobrr_znc_traefik_network_result
-
-    - name: Traefik builtin fail
-      when:
-        - not autobrr_znc_traefik_network_is_enabled
-        - not autobrr_znc_traefik_network_result.exists
-      ansible.builtin.fail:
-        msg: Traefik network does not exist nor is it enabled. Ensure the Traefik network variables contain valid entries.
-
-    - name: Create traefik network
-      when: not autobrr_znc_traefik_network_result.exists
-      community.docker.docker_network:
-        name: '{{ autobrr_znc_traefik_network }}'
-        driver: '{{ autobrr_znc_traefik_network_driver }}'
-        ipam_config:
-          - subnet: '{{ autobrr_znc_traefik_network_subnet }}'
-
-################################
 # CONTAINER
 ################################
 
 - name: Create ZNC container
-  when: not autobrr_znc_traefik_is_enabled
+  when: (not autobrr_toggles_enable_traefik) or (not autobrr_znc_traefik_is_enabled)
   community.docker.docker_container:
     name: '{{ autobrr_znc_basics_name }}'
     image: '{{ autobrr_znc_basics_image_repo }}:{{ autobrr_znc_basics_image_tag }}'
@@ -67,7 +40,9 @@
     restart_policy: '{{ autobrr_znc_basics_restart_policy }}'
 
 - name: Create ZNC traefik container
-  when: autobrr_znc_traefik_is_enabled
+  when:
+    - autobrr_toggles_enable_traefik
+    - autobrr_znc_traefik_is_enabled
   community.docker.docker_container:
     name: '{{ autobrr_znc_basics_name }}'
     image: '{{ autobrr_znc_basics_image_repo }}:{{ autobrr_znc_basics_image_tag }}'

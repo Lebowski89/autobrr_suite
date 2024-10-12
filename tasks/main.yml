@@ -1,19 +1,11 @@
 ---
 
 ################################
-# CHECK
-################################
-
-- name: Autobrr builtin fail
-  when: not autobrr_is_enabled
-  ansible.builtin.fail:
-    msg: 'Autobrr role is being run but one or multiple variables are empty. Check the defaults/autobrr.yml file.'
-
-################################
 # DEPENDENCIES
 ################################
 
 - name: Install prerequisite apt packages
+  when: autobrr_toggles_enable_apt_packages
   ansible.builtin.apt:
     pkg:
       - python3-requests
@@ -31,7 +23,9 @@
 ################################
 
 - name: Apt install docker if required
-  when: ansible_os_family == 'Debian'
+  when:
+    - autobrr_toggles_enable_docker_install
+    - ansible_os_family == 'Debian'
   block:
     - name: Gather apt facts
       ansible.builtin.package_facts:
@@ -147,23 +141,23 @@
 ################################
 
 - name: Include postgres container tasks
-  when: autobrr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_container.yml'
+  when: autobrr_toggles_enable_postgres
+  ansible.builtin.include_tasks: postgres/container.yml
 
 - name: Include postgres database tasks
-  when: autobrr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_database.yml'
+  when: autobrr_toggles_enable_postgres
+  ansible.builtin.include_tasks: postgres/database.yml
 
 - name: Include postgres autobrr config tasks
-  when: autobrr_postgres_is_enabled
-  ansible.builtin.include_tasks: 'postgres/postgres_config_toml.yml'
+  when: autobrr_toggles_enable_postgres
+  ansible.builtin.include_tasks: postgres/config_toml.yml
 
 ################################
 # TRAEFIK
 ################################
 
 - name: Conduct traefik tasks
-  when: autobrr_traefik_is_enabled
+  when: autobrr_toggles_enable_traefik
   block:
     - name: Register traefik network
       community.docker.docker_network_info:
@@ -190,15 +184,15 @@
 ################################
 
 - name: Include cloudflare tasks
-  when: autobrr_cloudflare_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/cloudflare.yml'
+  when: autobrr_toggles_enable_cloudflare_dns
+  ansible.builtin.include_tasks: sub_tasks/cloudflare.yml
 
 ################################
 # CONTAINER
 ################################
 
 - name: Create autobrr container
-  when: not autobrr_traefik_is_enabled
+  when: (not autobrr_toggles_enable_traefik) or (not autobrr_traefik_is_enabled)
   community.docker.docker_container:
     name: '{{ autobrr_basics_name }}'
     image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
@@ -213,7 +207,9 @@
     restart_policy: '{{ autobrr_basics_restart_policy }}'
 
 - name: Create autobrr traefik container
-  when: autobrr_traefik_is_enabled
+  when:
+    - autobrr_toggles_enable_traefik
+    - autobrr_traefik_is_enabled
   community.docker.docker_container:
     name: '{{ autobrr_basics_name }}'
     image: '{{ autobrr_basics_image_repo }}:{{ autobrr_basics_image_tag }}'
@@ -233,17 +229,35 @@
 ################################
 
 - name: Include omegabrr tasks
-  when: autobrr_omegabrr_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/omegabrr.yml'
+  when: autobrr_toggles_enable_omegabrr
+  ansible.builtin.include_tasks: sub_tasks/omegabrr.yml
 
 ################################
-# IRC
+# THELOUNGE
 ################################
 
-- name: Include znc tasks
-  when: autobrr_znc_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/znc.yml'
+- name: Include thelounge container tasks
+  when: autobrr_toggles_enable_thelounge
+  ansible.builtin.include_tasks: thelounge/container.yml
 
-- name: Include thelounge tasks
-  when: autobrr_thelounge_is_enabled
-  ansible.builtin.include_tasks: 'sub_tasks/thelounge.yml'
+- name: Include thelounge cloudflare tasks
+  when: 
+    - autobrr_toggles_enable_thelounge
+    - autobrr_toggles_enable_cloudflare_dns
+  ansible.builtin.include_tasks: thelounge/cloudflare.yml
+
+################################
+# ZNC
+################################
+
+- name: Include znc container tasks
+  when: autobrr_toggles_enable_znc
+  ansible.builtin.include_tasks: znc/container.yml
+
+- name: Include znc cloudflare tasks
+  when: 
+    - autobrr_toggles_enable_znc
+    - autobrr_toggles_enable_cloudflare_dns
+  ansible.builtin.include_tasks: znc/cloudflare.yml
+
+

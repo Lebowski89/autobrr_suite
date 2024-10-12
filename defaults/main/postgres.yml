@@ -22,9 +22,9 @@ autobrr_postgres_network_subnet: ''  ## only required if network doesn't exist
 # ENV
 ################################
 
-autobrr_postgres_env_timezone: ''
-autobrr_postgres_env_puid: ''
-autobrr_postgres_env_pgid: ''
+autobrr_postgres_env_timezone: 'Etc/UTC'
+autobrr_postgres_env_puid: '1000'
+autobrr_postgres_env_pgid: '1000'
 
 ################################
 # PORTS
@@ -65,12 +65,3 @@ autobrr_postgres_auth_password_file: 'postgres_key.txt'
 ################################
 
 autobrr_postgres_database: 'autobrr'
-
-################################
-# CLEAN
-################################
-
-  ## warning: the below toggles will delete any existing sqlite database files in the autobrr appdir.
-  ## toggle false if you're planning to migrate db data. See: https://autobrr.com/installation/supplementary/postgresql
-
-autobrr_postgres_clean_files: false  # true will delete any existing sqlite database files in the autobrr appdir.

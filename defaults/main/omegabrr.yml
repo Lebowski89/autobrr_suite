@@ -13,9 +13,9 @@ autobrr_omegabrr_basics_restart_policy: 'unless-stopped'
 # ENV
 ################################
 
-autobrr_omegabrr_env_timezone: ''
-autobrr_omegabrr_env_puid: ''
-autobrr_omegabrr_env_pgid: ''
+autobrr_omegabrr_env_timezone: 'Etc/UTC'
+autobrr_omegabrr_env_puid: '1000'
+autobrr_omegabrr_env_pgid: '1000'
 
 ################################
 # PORTS

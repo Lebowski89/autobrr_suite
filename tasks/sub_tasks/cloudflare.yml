@@ -1,9 +1,5 @@
 ---
 
-################################
-# autobrr
-################################
-
 - name: Remove existing CNAME DNS record
   community.general.cloudflare_dns:
     api_token: '{{ autobrr_cloudflare_api_token }}'

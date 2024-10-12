@@ -21,9 +21,9 @@ autobrr_network_backend_subnet: ''  ## only required if network doesn't exist
 # ENV
 ################################
 
-autobrr_env_timezone: ''
-autobrr_env_puid: ''
-autobrr_env_pgid: ''
+autobrr_env_timezone: 'Etc/UTC'
+autobrr_env_puid: '1000'
+autobrr_env_pgid: '1000'
 
 ################################
 # PORTS
@@ -50,27 +50,6 @@ autobrr_binds_config_mapping:
 
 autobrr_binds_logs_mapping:
   - '{{ autobrr_paths_logs_location }}:/logs'
-
-################################
-# TRAEFIK
-################################
-
-autobrr_traefik_subdomain: '{{ autobrr_basics_name }}'
-autobrr_traefik_domain: ''
-autobrr_traefik_port: '7474'
-
-  ## traefik docker network
-autobrr_traefik_network: 'traefik_proxy'
-autobrr_traefik_network_driver: ''  ## only required if network doesn't exist
-autobrr_traefik_network_subnet: ''  ## only required if network doesn't exist
-
-################################
-# CLOUDFLARE
-################################
-
-autobrr_cloudflare_record_type: 'A'  ## A (IPV4), AAAA (IPV6), CNAME, etc
-autobrr_cloudflare_proxy: 'true'  ## true for cloudflare DNS SSL
-autobrr_cloudflare_api_token: ''
 
 ################################
 # LOGS

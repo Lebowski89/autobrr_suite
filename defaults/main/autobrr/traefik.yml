@@ -1,0 +1,64 @@
+---
+
+################################
+# DOMAIN
+################################
+
+autobrr_traefik_subdomain:
+autobrr_traefik_domain:
+autobrr_traefik_port: '7474'
+
+################################
+# NETWORK
+################################
+
+autobrr_traefik_network: 'traefik_proxy'
+autobrr_traefik_network_driver: 'bridge'  ## only required if network doesn't exist
+autobrr_traefik_network_subnet: ''  ## only required if network doesn't exist
+
+################################
+# TLS
+################################
+
+autobrr_traefik_tls_certresolver: 'dns-cloudflare'
+autobrr_traefik_tls_options: 'tls-opts@file'
+
+################################
+# ROUTER (HTTP)
+################################
+
+  ## http
+autobrr_traefik_http_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+autobrr_traefik_http_rule: 'Host(`{{ autobrr_traefik_subdomain }}.{{ autobrr_traefik_domain }}`)'
+autobrr_traefik_http_priority: '20'
+
+  ## http-api
+autobrr_traefik_http_api_middlewares: 'globalHeaders@file,redirect-to-https@docker,robotHeaders@file'
+autobrr_traefik_http_api_rule: '{{ autobrr_traefik_http_rule }} && (PathPrefix(`/api`)'
+autobrr_traefik_http_api_priority: '30'
+
+################################
+# ROUTER (HTTPS)
+################################
+
+  ## https
+autobrr_traefik_https_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+autobrr_traefik_https_rule: 'Host(`{{ autobrr_traefik_subdomain }}.{{ autobrr_traefik_domain }}`)'
+autobrr_traefik_https_priority: '20'
+
+  ## https-api
+autobrr_traefik_https_api_middlewares: 'globalHeaders@file,secureHeaders@file,robotHeaders@file'
+autobrr_traefik_https_api_rule: '{{ autobrr_traefik_https_rule }} && (PathPrefix(`/api`)'
+autobrr_traefik_https_api_priority: '30'
+
+################################
+# AUTHELIA
+################################
+
+autobrr_traefik_authelia_middleware: 'authelia@docker'
+
+################################
+# CLOUDFLARE
+################################
+
+autobrr_traefik_cloudflare_middleware: 'cloudflarewarp@docker'
