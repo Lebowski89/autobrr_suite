@@ -47,3 +47,9 @@
     path: '{{ autobrr_paths_location }}/config.toml'
     search_string: 'postgresExtraParams'
     line: 'postgresExtraParams = ""'
+
+- name: Remove sqlite database file
+  when: autobrr_toggles_clean_files
+  ansible.builtin.file:
+    path: '{{ autobrr_paths_location }}/autobrr.db'
+    state: absent

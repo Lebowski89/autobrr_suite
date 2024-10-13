@@ -184,7 +184,9 @@
 ################################
 
 - name: Include cloudflare tasks
-  when: autobrr_toggles_enable_cloudflare_dns
+  when: 
+    - autobrr_toggles_enable_cloudflare_dns
+    - autobrr_cloudflare_is_enabled
   ansible.builtin.include_tasks: sub_tasks/cloudflare.yml
 
 ################################
@@ -244,6 +246,7 @@
   when: 
     - autobrr_toggles_enable_thelounge
     - autobrr_toggles_enable_cloudflare_dns
+    - autobrr_thelounge_cloudflare_is_enabled
   ansible.builtin.include_tasks: thelounge/cloudflare.yml
 
 ################################
@@ -258,6 +261,7 @@
   when: 
     - autobrr_toggles_enable_znc
     - autobrr_toggles_enable_cloudflare_dns
+    - autobrr_znc_cloudflare_is_enabled
   ansible.builtin.include_tasks: znc/cloudflare.yml
 
 

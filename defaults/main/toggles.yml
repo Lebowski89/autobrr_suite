@@ -28,13 +28,13 @@ autobrr_toggles_enable_docker_install: true
 ################################
 
   ## Toggle whether to use Postgres as a database for autobrr
-  ## If enabled, the role will edit autobrr's xml config file will the required Postgres settings
+  ## If enabled, the role will edit autobrr's config file will the required Postgres settings
   ## The role will then ping for an existing Postgres docker container and then create one if none exists
   ## Finally, the role will use 'community.postgresql.postgresql' modules to ping for an existing database and to create one if none exists
 
 autobrr_toggles_enable_postgres: true
 
-  ## warning: the below toggle will delete any existing sqlite database files in the autobrr appdir.
+  ## warning: the below toggle will delete any existing sqlite database file in the autobrr appdir.
 
 autobrr_toggles_clean_files: true
 
@@ -85,11 +85,6 @@ autobrr_toggles_enable_traefik: true
 ################################
 # AUTHELIA
 ################################
-
-  ## Toggle whether to change autobrr's config.xml authentication setting to 'External'
-  ## This prevents a double login when protecting autobrr with Authelia
-
-autobrr_toggles_enable_external_auth: true
 
   ## Toggle whether to include Authelia middleware to autobrr's Traefik labels
   ## Requires setting up Authelia and defining the Authelia middleware in Traefik - this role won't do that for you
